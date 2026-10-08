@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko" data-fonts="Pretendard">
+<head>
+<meta charset="utf-8">
+<title>showreel</title>
+<!-- fonts/fonts.css 는 new_project.py 가 실제로 있는 폰트만 골라 만든다(굵기마다 @font-face). -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* ── 비주얼 시스템 토큰: 무드 프리셋(references/design.md)에서 골라 바꾼다 ── */
+  :root {
+    --bg: #05060a;        /* 배경: 순흑보다 살짝 띄운 잉크 */
+    --ink: #f3efe6;       /* 본문 글자: 따뜻한 흰색 */
+    --dim: rgba(243,239,230,.55);
+    --accent: #f5b942;    /* 강조색 하나 — 핵심어·숫자·히트에만 */
+    --accent2: #3fe3ff;   /* 보조 강조(범주 구분이 필요할 때만) */
+    --display: "Pretendard", sans-serif;          /* 한글 헤드라인 900 */
+    --serif: "Noto Serif KR", "Pretendard", serif; /* 이름·인용 */
+    --num: "Anton", "Pretendard", sans-serif;      /* 거대 숫자 */
+    --mono: "JetBrains Mono", "Pretendard", monospace; /* 라벨·HUD (한글 폴백 필수) */
+  }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #wrap { transform-origin: 0 0; }
+  #stage { position: relative; overflow: hidden; background: var(--bg); color: var(--ink);
+           font-family: "Pretendard", sans-serif; font-kerning: normal; -webkit-font-smoothing: antialiased;
+           word-break: keep-all; }
+  .cam, .top, .scene { position: absolute; inset: 0; }
+  .scene { overflow: hidden; }
+  .a { position: absolute; }                     /* 절대 배치 헬퍼 */
+  .full { position: absolute; inset: 0; }
+  .center { position: absolute; left: 0; right: 0; text-align: center; }
+  .display { font-family: var(--display); font-weight: 900; letter-spacing: -0.045em; line-height: 1.05; }
+  .label { font-family: var(--mono); font-weight: 500; letter-spacing: .22em; text-transform: uppercase; font-size: 18px; color: var(--dim); }
+  /* 미리보기 플레이어 */
+  .player { position: fixed; left: 0; right: 0; bottom: 0; height: 44px; display: flex; gap: 12px; align-items: center;
+            padding: 0 12px; background: #111; color: #bbb; font: 12px/1 Menlo, monospace; }
+  .player .scrub { flex: 1; }
+  /* ── 장면별 스타일은 아래에 이어서 쓴다 ── */
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"></div></div>
+<script src="timeline.js"></script>  <!-- timeline.py 가 만든다(없으면 빈 TL). 나레이션·큐 시각의 단일 원천 -->
+<script src="engine.js"></script>
+<script src="fx.js"></script>
+<script src="scenes.js"></script>
+</body>
+</html>

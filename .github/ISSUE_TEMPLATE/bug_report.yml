@@ -1,0 +1,54 @@
+name: Bug report / 버그 신고
+description: A script fails, a render or mix looks wrong, or QA misses a problem. / 스크립트 오류, 렌더·믹스 문제, 검수 누락
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please remove API keys and personal paths from logs before posting.
+        신고해 주셔서 고맙습니다. 로그에서 API 키와 개인 경로를 지운 뒤 올려 주세요.
+  - type: dropdown
+    id: step
+    attributes:
+      label: Step / 단계
+      options:
+        - 0 Preflight / 환경 점검
+        - 1 Brief / 기획 브리프
+        - 2 Research / 조사
+        - 3 Script / 원고
+        - 4 Audio (narration, music, SFX, timeline) / 오디오
+        - 5 Images / 이미지
+        - 6 Scenes & engine / 장면·엔진
+        - 7 Draft render / 초안 렌더
+        - 8 Final render, mix, finish / 최종 렌더·믹스·마감
+        - 9 QA / 자동 검수
+        - Other / 기타
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened / 무슨 일이 있었나요
+      description: Include the command and the full error output. / 실행한 명령과 오류 출력 전체를 붙여 주세요.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 기대한 동작
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce / 재현 방법
+      description: The prompt you gave Claude, or the script commands. Attach stills or contact sheets for visual problems. / Claude에게 준 요청이나 스크립트 명령. 화면 문제는 스틸이나 검수 시트를 붙여 주세요.
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment / 환경
+      description: Paste the output of `python3 scripts/preflight.py`. / `preflight.py` 출력을 붙여 주세요.
+      render: text
+    validations:
+      required: true

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability / 보안 취약점
+    url: https://github.com/revfactory/showreel/security/advisories/new
+    about: Report security problems privately. / 보안 문제는 비공개로 신고해 주세요.
