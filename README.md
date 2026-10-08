@@ -14,10 +14,10 @@
 [![Release](https://img.shields.io/github/v/release/revfactory/showreel?color=3fe3ff)](https://github.com/revfactory/showreel/releases)
 
 <a href="https://github.com/revfactory/showreel/releases/download/v1.0.0/showreel-promo-120s.mp4">
-  <img src="docs/media/showreel-preview.gif" alt="Highlights from the 2-minute promo video that the showreel skill made about itself" width="720">
+  <img src="docs/media/showreel-preview.gif" alt="Highlights from a 2-minute showreel promo video made with the showreel skill" width="720">
 </a>
 
-<sub>Highlights from a 2-minute promo that this skill produced about itself. Sound on in the full video below.</sub>
+<sub>Highlights from a 2-minute promo for showreel, made with this skill. The full video below has sound.</sub>
 
 </div>
 

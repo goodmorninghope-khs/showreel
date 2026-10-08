@@ -14,10 +14,10 @@
 [![Release](https://img.shields.io/github/v/release/revfactory/showreel?color=3fe3ff)](https://github.com/revfactory/showreel/releases)
 
 <a href="https://github.com/revfactory/showreel/releases/download/v1.0.0/showreel-promo-120s.mp4">
-  <img src="docs/media/showreel-preview.gif" alt="showreel 스킬이 스스로를 소개하려고 만든 2분 홍보 영상의 주요 장면" width="720">
+  <img src="docs/media/showreel-preview.gif" alt="showreel 스킬로 만든 2분짜리 showreel 소개 영상의 주요 장면" width="720">
 </a>
 
-<sub>이 스킬이 스스로를 소개하려고 만든 2분 홍보 영상의 주요 장면입니다. 소리는 아래 전체 영상에서 들을 수 있습니다.</sub>
+<sub>이 스킬로 만든 2분짜리 showreel 소개 영상의 주요 장면입니다. 소리는 아래 전체 영상에서 들을 수 있습니다.</sub>
 
 </div>
 
