@@ -6,9 +6,11 @@
 - API 요약
 - 장면 작성 순서
 - 기법 코드: 글자 / 숫자 / 사진 / 도형·선 / 캔버스 / 전환 / 나레이션·음악 동기
+- WebGL: 셰이더와 3D
+- 미리 계산하는 시뮬레이션
 - 전역 레이어(fx.js)
 - 렌더러 사용법
-- 긴 영상 나누기
+- 나눠 만들기
 - 문제 해결
 
 ## 구조와 규칙
@@ -19,7 +21,9 @@
   engine.js     엔진(고치지 않는다 — new_project.py 가 최신으로 덮어쓴다)
   fx.js         전역 레이어(그레인·HUD·자막·섬광 등)
   timeline.js   timeline.py 가 만든다(window.TL: 큐·나레이션 단어 시각·음악 히트)
-  scenes.js     장면 코드 — 여기만 쓴다(길면 scenes_ch01.js … 로 나누고 index.html 에 script 추가)
+  scenes.js     장면 코드 — 여기만 쓴다(구간이 많으면 scenes_s01.js … 로 나누고 index.html 에 script 추가)
+  _example_scenes.js  API 사용 예시(불러오지 않는다). 화면의 출발점으로 쓰지 않는다
+  lib/          WebGL 라이브러리 등 외부 스크립트를 파일로 둔다(렌더 중 네트워크에 기대지 않는다)
   fonts/        new_project.py 가 채운다
 ```
 
@@ -28,7 +32,7 @@
 **규칙** — 렌더러는 임의 시각으로 바로 이동하고, 여러 워커가 구간을 나눠 그리며, 모션 블러를 위해 프레임 사이 소수 시각도 찍는다. 그래서:
 
 1. `render(lt)`의 결과는 시각에만 달려야 한다. 이전 프레임에 계산한 값을 누적하지 않는다.
-2. `Math.random()`, `Date.now()`, `performance.now()`, CSS `transition`·`animation`·`@keyframes`, `requestAnimationFrame` 루프를 쓰지 않는다. 무작위는 `rand(i, salt)`, 흔들림은 `noise(t, seed)`.
+2. `Math.random()`, `Date.now()`, `performance.now()`, CSS `transition`·`animation`·`@keyframes`, `requestAnimationFrame` 루프를 쓰지 않는다. 무작위는 `rand(i, salt)`, 흔들림은 `noise(t, seed)`. 누적이 필요한 계산(물리 시뮬레이션)은 setup 에서 미리 계산한다(아래 "미리 계산하는 시뮬레이션").
 3. DOM 은 `setup`에서 만들고 `render`에서는 스타일만 바꾼다. `render`에서 요소를 만들거나 지우지 않는다.
 4. 시각은 숫자 대신 큐를 쓴다: `cue('name')`, `cue('line.n03')`, `cue('music.hit2')`. 나레이션을 다시 만들어도 화면이 따라온다.
 5. 장면이 끝나기 0.1초 전에 퇴장을 끝낸다. 장면 경계에서 빈 화면·잔상이 생기는 가장 흔한 원인이다.
@@ -66,9 +70,9 @@ REEL.TL              // timeline.js: { cues, vo:[{id,text,sub,start,end,words:[[
 ## 장면 작성 순서
 
 1. 스토리보드의 장면마다 `REEL.scene` 하나. 시작·끝은 큐로 정한다.
-2. 대표 장면 2~3개를 먼저 만들고 스틸 시트를 본다(스타일 프레임). 무드·크기·여백이 맞으면 나머지를 만든다.
+2. 구간마다 대표 프레임을 먼저 만들고 스틸 시트를 본다(스타일 프레임, SKILL.md 7단계). 구간끼리 다른 작업으로 보이고 각 프레임이 포스터로 쓸 수준이면 나머지를 만든다.
 3. 장면 하나를 쓸 때마다 그 장면의 시작+0.5초, 큐+0.4초, 끝-0.6초 스틸을 뽑아 본다.
-4. 전역 레이어(카메라·섬광·레터박스·그레인·HUD·자막)는 마지막에 붙인다.
+4. 전역 레이어(카메라·섬광·자막 등)가 필요하면 마지막에 붙인다.
 
 ## 기법 코드
 
@@ -100,13 +104,13 @@ const sp = prog(lt, T - start - 0.28, 0.3, ease.snap);   // 히트 0.28초 전�
 css(this.name, { opacity: sp, transform: `scale(${lerp(1.9, 1, sp)})`, filter: `blur(${(1 - sp) * 24}px)` });
 ```
 
-같은 글자를 강조색으로 복제해 `mix-blend-mode: screen`으로 겹치고, 히트 뒤 0.5초 동안 커지며 사라지게 하면 잔상이 생긴다(`assets/engine/scenes.js`의 오프닝 장면).
+같은 글자를 강조색으로 복제해 `mix-blend-mode: screen`으로 겹치고, 히트 뒤 0.5초 동안 커지며 사라지게 하면 잔상이 생긴다(코드는 `reel/_example_scenes.js`의 오프닝 장면).
 
 ### 글자: 스크램블·타자
 
 ```js
-this.tag.textContent = scramble('CH.02 — ARCHIVE', prog(lt, 0.2, 0.6, ease.linear), lt, 3);
-const full = 'ARCHIVE · 2026.10.07';                     // 타자 + 깜빡이는 커서
+this.tag.textContent = scramble('<구간 카피>', prog(lt, 0.2, 0.6, ease.linear), lt, 3);
+const full = '<구간 카피>';                              // 타자 + 깜빡이는 커서
 this.kick.textContent = full.slice(0, Math.floor(prog(lt, 0.4, 0.6, ease.linear) * full.length)) + (Math.floor(lt * 4) % 2 ? '▍' : ' ');
 ```
 
@@ -121,7 +125,7 @@ css(this.word, { backgroundImage: 'url(../assets/img/stage.jpg)', backgroundSize
 ### 글자: 빛 스윕
 
 ```js
-css(this.name, { backgroundImage: 'linear-gradient(105deg, var(--ink) 40%, #fff6dc 50%, var(--ink) 60%)', backgroundSize: '300% 100%',
+css(this.name, { backgroundImage: 'linear-gradient(105deg, var(--ink) 40%, var(--accent) 50%, var(--ink) 60%)', backgroundSize: '300% 100%',
   WebkitBackgroundClip: 'text', color: 'transparent', backgroundPosition: `${lerp(100, -100, prog(lt, 1.2, 1.1, ease.inOutSine))}% 0` });
 ```
 
@@ -159,10 +163,10 @@ css(this.card, { clipPath: `inset(0 ${(1 - open) * 100}% 0 0)`,
 ### 사진: 누끼 + 림라이트
 
 ```js
-// prep_images.py --cutout 으로 만든 투명 PNG. 누끼를 마스크로 써서 금색 빛을 인물 안쪽 가장자리에만
+// prep_images.py --cutout 으로 만든 투명 PNG. 누끼를 마스크로 써서 구간 팔레트의 빛을 인물 안쪽 가장자리에만
 css(this.rim, { WebkitMaskImage: 'url(../assets/img/person_cut.png)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat',
-  background: 'linear-gradient(100deg, rgba(245,185,66,.9), transparent 45%)', mixBlendMode: 'screen' });
-css(this.person, { filter: 'drop-shadow(0 0 30px rgba(245,185,66,.35))' });
+  background: 'linear-gradient(100deg, var(--accent), transparent 45%)', mixBlendMode: 'screen' });
+css(this.person, { filter: 'drop-shadow(0 0 30px var(--accent))' });
 ```
 
 ### 도형·선: SVG 선 그리기(노드 그래프·지도·도식)
@@ -188,7 +192,7 @@ css(this.marq, { fontFamily: 'var(--num)', fontSize: '340px', whiteSpace: 'nowra
 
 ### 캔버스: 입자가 모여 글자가 됨
 
-`assets/engine/scenes.js`의 엔드카드 장면을 그대로 참고한다. 핵심은 다음과 같다.
+계산 방법은 `reel/_example_scenes.js` 엔드카드의 setup·render 코드에 있다. 색·서체·구도는 따라 하지 않는다. 핵심은 다음과 같다.
 
 1. setup 에서 오프스크린 캔버스에 글자를 그린다(폰트는 이미 로드돼 있다).
 2. 알파가 있는 픽셀을 5px 간격으로 샘플링해 목표점을 만든다.
@@ -261,22 +265,112 @@ css(this.bg, { opacity: 0.35 + 0.4 * level(t, 'music') });  // 음악 에너지�
 
 막대 높이처럼 큰 움직임에는 그대로 쓰고, 밝기·크기처럼 눈에 띄는 값에는 0.3~0.5배로 줄여 쓴다. 매 프레임 값이 바뀌므로 깜빡임이 심하면 `(level(t) + level(t - 0.04) + level(t - 0.08)) / 3`처럼 평균을 낸다.
 
+## WebGL: 셰이더와 3D
+
+렌더러(헤드리스 Chrome)에서 WebGL2 셰이더와 three.js(r160 `build/three.min.js`) 장면이 렌더되고, 시각마다 다른 프레임이 나오며 `--sub 4` 모션 블러도 된다(2026-10 확인). 규칙은 다른 장면과 같다. 그리는 일은 `render(lt)` 안에서 시각으로만 한다.
+
+- 컨텍스트는 `preserveDrawingBuffer: true`로 만든다. 캡처 시점에 버퍼가 비어 검게 나오는 것을 막는다.
+- 캔버스 크기는 `REEL.W × REEL.H` 픽셀로 고정하고 CSS 크기도 같게 둔다. `--scale 0.5` 초안에서도 장면 좌표는 바뀌지 않는다.
+- 라이브러리는 `reel/lib/`에 파일로 받아 `index.html`에서 `engine.js` 앞에 `<script src="lib/three.min.js"></script>`로 불러온다. 렌더 중 CDN에 기대지 않는다.
+- three.js 애니메이션 믹서는 `mixer.setTime(lt)`로 시각을 지정한다. `clock.getDelta()`를 쓰지 않는다.
+- 한글을 3D로 쓰려면 캔버스 2D에 글자를 그려 `THREE.CanvasTexture`로 붙이거나, 글자 픽셀에서 뽑은 점(T04)을 3D 좌표로 올린다.
+
+셰이더(전체 화면 사각형 하나에 프래그먼트 셰이더):
+
+```js
+setup(el) {
+  const c = h('canvas', '', el); c.width = REEL.W; c.height = REEL.H;
+  css(c, { position: 'absolute', left: 0, top: 0, width: REEL.W + 'px', height: REEL.H + 'px' });
+  const gl = this.gl = c.getContext('webgl2', { preserveDrawingBuffer: true, antialias: true });
+  const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o);
+    if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+  const pr = this.pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, `#version 300 es
+in vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`));
+  gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, `#version 300 es
+precision highp float; uniform float t; uniform vec2 r; out vec4 o;
+void main(){ vec2 u = (gl_FragCoord.xy - .5 * r) / r.y;
+  float d = length(u) - .3 - .05 * sin(10. * atan(u.y, u.x) + t * 6.);
+  o = vec4(mix(vec3(1., .3, .1), vec3(.05, .1, .3), smoothstep(0., .01, d)), 1.); }`));
+  gl.linkProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+},
+render(lt) {
+  const gl = this.gl; gl.viewport(0, 0, REEL.W, REEL.H); gl.useProgram(this.pr);
+  gl.uniform1f(gl.getUniformLocation(this.pr, 't'), lt);
+  gl.uniform2f(gl.getUniformLocation(this.pr, 'r'), REEL.W, REEL.H);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+```
+
+three.js:
+
+```js
+setup(el) {
+  const r = this.r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  r.setPixelRatio(1); r.setSize(REEL.W, REEL.H, false); el.appendChild(r.domElement);
+  css(r.domElement, { position: 'absolute', left: 0, top: 0, width: REEL.W + 'px', height: REEL.H + 'px' });
+  this.scene = new THREE.Scene();
+  this.cam = new THREE.PerspectiveCamera(35, REEL.W / REEL.H, 0.1, 100); this.cam.position.set(0, 0, 8);
+  this.m = new THREE.Mesh(new THREE.TorusKnotGeometry(1.4, 0.45, 256, 32),
+    new THREE.MeshStandardMaterial({ color: 0xff5a1f, metalness: 0.6, roughness: 0.25 }));
+  const key = new THREE.DirectionalLight(0xffffff, 3); key.position.set(3, 4, 5);
+  this.scene.add(this.m, key, new THREE.AmbientLight(0x404060, 1.2));
+},
+render(lt) { this.m.rotation.set(lt * 0.8, lt * 1.3, 0); this.r.render(this.scene, this.cam); }
+```
+
+주의: 장면이 꺼진 동안(`display:none`)에는 그리지 않아도 된다. 셰이더의 무작위는 `fract(sin(dot(...)))` 같은 결정적 해시로 만든다. 큰 셰이더는 프레임당 수십 ms가 들 수 있으니 초안 렌더 시간을 보고 최종 렌더 시간을 추정한다.
+
+## 미리 계산하는 시뮬레이션
+
+천이 펄럭이거나 조각이 부딪혀 쌓이는 장면처럼 이전 상태가 필요한 움직임은 setup 에서 고정 간격(1/fps 또는 그보다 촘촘하게)으로 끝까지 계산해 배열에 저장하고, render 에서는 시각으로 읽어 보간한다. 초기값의 무작위는 `rand(i, salt)`로 정한다. 이렇게 하면 렌더 워커가 어느 시각부터 그려도 같은 화면이 나온다.
+
+```js
+setup() {
+  const N = 400, steps = Math.ceil((this._e - this._s) * 120);          // 장면 길이(초) × 120 단계. _s·_e 는 엔진이 setup 전에 채운다
+  const S = this.states = new Float32Array((steps + 1) * N * 2);
+  let x = Array.from({ length: N }, (_, i) => rand(i, 1) * REEL.W), y = Array.from({ length: N }, (_, i) => -rand(i, 2) * 600);
+  let vx = x.map((_, i) => (rand(i, 3) - 0.5) * 200), vy = x.map(() => 0);
+  for (let k = 0; k <= steps; k++) {
+    for (let i = 0; i < N; i++) {
+      S[(k * N + i) * 2] = x[i]; S[(k * N + i) * 2 + 1] = y[i];
+      vy[i] += 2400 / 120; x[i] += vx[i] / 120; y[i] += vy[i] / 120;
+      if (y[i] > 900) { y[i] = 900; vy[i] *= -0.45; vx[i] *= 0.8; }  // 바닥에서 튐
+    }
+  }
+  this.N = N; this.steps = steps;
+},
+render(lt) {
+  const f = Math.min(this.steps, lt * 120), k = Math.floor(f), a = f - k, k2 = Math.min(this.steps, k + 1), S = this.states;
+  for (let i = 0; i < this.N; i++) {
+    const px = S[(k * this.N + i) * 2] * (1 - a) + S[(k2 * this.N + i) * 2] * a;
+    const py = S[(k * this.N + i) * 2 + 1] * (1 - a) + S[(k2 * this.N + i) * 2 + 1] * a;
+    // px, py 로 그린다
+  }
+}
+```
+
+`this._s`·`this._e`는 엔진이 setup 을 부르기 전에 채우는 장면의 시작·끝 시각(초)이다. 단계 수 × 요소 수가 수천만을 넘으면 setup 이 길어지므로 요소 수나 간격을 줄인다.
+
 ## 더 많은 표현
 
 아이소메트릭 도시, 한글 자모 조립, 가변 굵기 물결, 유리·크롬 활자, 프리즘 빛줄기, 비트 그리드, 데이터 맥박, 기계식 카운터, 3D 기기 UI, 펀치 인, 매치 컷, 비트 몽타주, 잔상 등은 `techniques.md`에 코드와 함께 있다. 같은 문서 맨 앞의 싱크·첫 프레임·섬광·결정성 규칙은 모든 장면에 적용한다.
 
 ## 전역 레이어(fx.js)
 
-`scenes.js` 끝에서 호출한다. 호출 순서가 위아래 순서다.
+모두 선택 사항이다. 콘셉트에 필요한 것만 `scenes.js` 끝에서 호출한다. 호출 순서가 위아래 순서다. 레터박스·그레인·비네트·HUD를 습관처럼 모두 붙이지 않는다(`design.md`의 "뻔한 화면").
 
 ```js
 FX.camera({ shakes: [[cue('name'), 14, 0.4]], drift: 0.6 });          // 장면 전체 흔들림·드리프트
 FX.flash([[cue('name'), 0.2, 0.12]]);                                  // [시각, 길이, 세기(≤0.15), 색]
-FX.leak([[cue('scene.ch2'), 1.4, 'rgba(255,170,70,.9)', 0.7]]);
+FX.leak([[cue('scene.s02'), 1.4, 'rgba(255,170,70,.9)', 0.7]]);
 FX.letterbox(t => 1 - prog(t, cue('name') - 0.1, 0.5, ease.swift) + prog(t, 57, 0.5, ease.swift));  // 1=닫힘
 FX.vignette({ strength: 0.6 });
 FX.grain({ opacity: 0.09 });
-FX.hud({ left: '● SHOWREEL — 2026', chapters: [[0, 'PROLOGUE'], ['scene.ch1', 'CH.01 / ORIGIN']], from: 3, to: 57 });
+FX.hud({ left: '<라벨>', chapters: [[0, '<구간 이름>'], ['scene.s01', '<구간 이름>']], from: 3, to: 57 });
 FX.subtitles({ size: 40 });                                            // TL.vo 의 sub 를 번인. "nosub" 줄은 번인에서만 빠진다(SRT 에는 남음, SRT 에서 빼려면 "nosrt")
 // 세로(9:16) 영상이면 HUD·자막이 앱 UI 영역(위 250px·아래 420px)을 자동으로 피한다
 ```
@@ -286,27 +380,30 @@ FX.subtitles({ size: 40 });                                            // TL.vo 
 ```bash
 node $S/render.mjs --dir reel --serve                                  # 미리보기 URL(사용자에게 줄 수도 있다)
 node $S/render.mjs --dir reel --stills 1.2,4.5,9 --outdir qa/stills    # 지정 시각 스틸
-node $S/render.mjs --dir reel --every 0.5 --from 8 --to 16 --outdir qa/stills_ch1
+node $S/render.mjs --dir reel --every 0.5 --from 8 --to 16 --outdir qa/stills_s01
 node $S/render.mjs --dir reel --out out/draft.mp4 --scale 0.5          # 초안
 node $S/render.mjs --dir reel --out out/video.mp4 --sub 4 --format png # 최종(모션 블러)
 ```
 
 - 로그 첫 줄에 로드된 폰트 목록이 나온다. 쓰려는 서체가 없으면 `fonts/fonts.css`를 확인한다.
 - 종료 코드 2는 페이지 오류다. 로그의 `[pageerror]`를 고친다.
+- 렌더 로그에는 `console.error`와 `[REEL]`로 시작하는 `console.warn`만 나온다. 장면 코드의 디버그 값은 `console.warn('[REEL] …')`로 남긴다.
 - 최종 렌더는 청크(2초) 단위로 저장되므로 중단돼도 같은 명령을 다시 실행하면 이어서 렌더한다. 설정을 바꾸면 처음부터 다시 렌더한다.
 - 다른 렌더가 같은 컴퓨터에서 돌고 있으면 10배 넘게 느려진다. `--workers 2`로 줄인다.
 
-## 긴 영상 나누기
+## 나눠 만들기
 
-3분 넘는 영상은 챕터마다 `scenes_ch01.js`, `scenes_ch02.js`로 나누고 `index.html`에 script 태그를 추가한다. 공용 헬퍼(색, 공통 컴포넌트)는 `scenes_common.js`에 둔다.
+구간이 많은 쇼릴이나 3분 넘는 영상은 구간(또는 챕터)마다 `scenes_s01.js`, `scenes_s02.js`로 나누고 `index.html`에 script 태그를 추가한다. 공용 헬퍼는 `scenes_common.js`에 둔다. 구간마다 아트 디렉션이 다른 쇼릴은 구간을 서브에이전트에 하나씩 맡겨 동시에 만들 수 있다. 메인은 콘셉트를 지키는지 보고, 구간 사이 전환과 전체 비평을 맡는다.
 
-서브에이전트에 챕터를 나눠 맡길 때는 다음 계약을 프롬프트에 넣는다.
+서브에이전트에 구간을 맡길 때는 다음 계약을 프롬프트에 넣는다.
 
-- 먼저 읽을 것: 이 문서(engine.md), design.md, `reel/scenes_common.js`, `timeline.json`의 자기 챕터 부분
-- 수정 범위: `reel/scenes_chNN.js`만. 공용 파일의 문제는 고치지 말고 보고한다
-- 안전 영역, 자막 영역, 1초 넘는 정지 금지, 큐 ±3프레임, 마지막 10프레임 새 정보 금지, `Math.random` 금지
-- 검증: 장면마다 시작+0.5·큐+0.4·끝-0.6초 스틸을 `qa/stills_chNN/`에 뽑아 시트를 Read로 확인하고 고친 뒤 보고
-- 보고는 짧게(코드를 붙이지 않는다): 만든 장면, 확인한 시트 경로, 공용 코드 문제
+- 먼저 읽을 것: 이 문서(engine.md), design.md, `concept.md`의 자기 구간 행(매체·팔레트·서체·움직임·기술 과제·연결 방법), `reel/scenes_common.js`, `timeline.json`의 자기 구간 부분
+- 기준: SKILL.md 맨 앞 "이 스킬이 맞추는 기준" 표. 자기 구간이 독립된 작업 한 편으로 보여야 한다
+- 수정 범위: `reel/scenes_sNN.js`와 그 구간의 `reel/lib/`·`assets/` 파일만. 공용 파일의 문제는 고치지 말고 보고한다
+- 작업 파일은 프로젝트 폴더 안에 둔다. `/tmp`를 쓰지 않는다
+- 안전 영역, 자막 영역, 의도하지 않은 1초 넘는 정지 금지, 큐 ±3프레임, 마지막 10프레임 새 정보 금지, `Math.random` 금지
+- 검증: 장면마다 시작+0.5·큐+0.4·끝-0.6초 스틸과 핵심 순간의 프레임 띠(0.033~0.1초 간격)를 `qa/stills_sNN/`에 뽑아 시트를 Read로 확인하고 고친 뒤 보고
+- 보고는 짧게(코드를 붙이지 않는다): 만든 장면, 확인한 시트 경로, 공용 코드 문제, 스스로 본 이 구간의 가장 약한 점. 보고는 응답 텍스트로 돌려준다. 서브에이전트에게 보고 파일을 쓰게 하면 실행 환경이 막을 수 있으므로, 기록이 필요하면 메인이 받은 보고를 파일로 남긴다
 
 ## 문제 해결
 

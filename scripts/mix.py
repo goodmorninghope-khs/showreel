@@ -255,7 +255,9 @@ def main():
         # 나레이션이 없으면 효과음이 음악에 묻히지 않는지 본다(타격 직후 0.3초 RMS 비교)
         print(f"{'효과음':14s} {'시각':>6s} {'대 음악':>7s}  (+3dB↑ 들림 · 0dB↓ 묻힘)")
         for e in tl["sfx"]:
-            s0 = int(max(0, e["t"]) * SR)
+            # 끝을 맞춘(align end) 효과음은 t 에서 끝나므로 t 직전 0.3초를, 나머지는 t 부터 0.3초를 잰다
+            t0 = e["t"] - 0.3 if e.get("align") == "end" else e["t"]
+            s0 = int(max(0, t0) * SR)
             s1 = min(N, s0 + int(0.3 * SR))
             if s1 - s0 < 100:
                 continue

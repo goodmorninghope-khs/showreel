@@ -36,7 +36,7 @@
 
 | 보이스 | voice_id | 특징 | 권장 모델 |
 | --- | --- | --- | --- |
-| **Marcus (기본)** | `ibCGc01503OQd2R6i1n1` | 깊고 차분한 바리톤, 서울 억양, 내레이션용(F0 약 78~83Hz) | `eleven_multilingual_v2` (파인튜닝됨) |
+| Marcus | `ibCGc01503OQd2R6i1n1` | 깊고 차분한 바리톤, 서울 억양, 낭독용. 아래 설정을 검증한 보이스(F0 약 78~83Hz) | `eleven_multilingual_v2` (파인튜닝됨) |
 | Do Hyeon | `FQ3MuLxZh0jHcZmA5vW1` | 깊은 중년 남성 | `eleven_v3` |
 | Yohan Koo | `4JJwo477JUAx3HV0T7n7` | 자신감 있는 권위형 | v2·v4 |
 | 안재동 Jaedong Ahn | `ZcZcEsYxXAIc3nNSev1H` | 차분한 중년 남성 | v2 |
@@ -52,7 +52,7 @@
 - `eleven_v3`: 오디오 태그(`[serious]`, `[whispers]`)를 쓴다. 이름·숫자를 v2보다 정확히 읽은 사례가 있다(이훈희, 2026). stability는 0.5. 0.0은 없는 말을 붙였고 1.0은 오독했다. `previous_text`를 받지 않는다. 문제 줄만 v3로 바꿀 때는 음높이가 앞뒤 줄과 이어지는지 확인한다.
 - `eleven_v4`: stability·similarity만 받는다. Marcus는 v4로 파인튜닝돼 있지 않아 음색이 달라질 수 있다.
 
-설정 범위(웅장한 낭독): stability 0.42~0.5, similarity 0.8~0.82, style 0.38~0.45, speed 0.97~1.05, speaker boost 켬. style을 올리면 덜 단조롭다.
+Marcus 낭독 설정(검증한 값): stability 0.42~0.5, similarity 0.8~0.82, style 0.38~0.45, speed 0.97~1.05, speaker boost 켬. style을 올리면 덜 단조롭다.
 
 ## 보이스 교차
 
@@ -62,15 +62,15 @@
 
 | 방식 | 예 | 맞는 곳 |
 | --- | --- | --- |
-| 주 내레이터 + 인용 보이스 | Marcus가 이끌고, 인물의 말·고객의 목소리만 다른 보이스 | 프로필, 브랜드 필름 |
+| 주 나레이터 + 인용 보이스 | Marcus가 이끌고, 인물의 말·고객의 목소리만 다른 보이스 | 프로필, 브랜드 필름 |
 | 장(챕터)마다 보이스 | 1장 Marcus, 2장 Yohan Koo, 3장 Anna Kim | 여러 관점을 보여 주는 소개 |
-| 한 단어씩 이어 말하기 | 네 보이스가 "기획." "원고." "목소리." "영상."을 하나씩 | 오프닝 훅, 몽타주 |
+| 한 단어씩 이어 말하기 | 네 보이스가 "기획." "원고." "목소리." "영상."을 하나씩 | 오프닝 도입, 몽타주 |
 | 같은 문장을 여러 보이스로 | 같은 문장을 보이스만 바꿔 연달아 들려 주기 | 보이스·기능 시연 |
 | 속삭임·연기 | Anna Kim `eleven_v3` + `[whispers]` | 티저의 반전 |
 
 - 보이스는 서너 개까지만 쓴다. 넘으면 누가 말하는지 헷갈린다.
 - 보이스가 바뀌는 줄에는 화면에도 변화(장면 전환, 화자 이름 라벨, 색)를 같이 준다.
-- 진지한 인물 프로필은 주 내레이터 하나를 기본으로 하고, 교차는 오프닝·인용에만 쓴다.
+- 진지한 인물 프로필은 주 나레이터 하나를 기본으로 하고, 교차는 오프닝·인용에만 쓴다.
 - 보이스마다 발음 버릇이 다르므로 `--stt` 검증을 줄마다 한다.
 
 ## 나레이션 생성과 발음 검증
@@ -104,6 +104,7 @@ stability를 바꾸거나 모델을 통째로 바꾸는 것은 효과가 없었�
 
 ```json
 {"duration": 60, "mood": "cinematic", "bpm": 90, "key": "D", "minor": true,
+ "global_styles": ["<콘셉트가 정한 장르·악기·질감, 영어>", "instrumental"],
  "sections": [{"name": "Cold Open", "start": 0, "energy": 0.2},
               {"name": "Reveal", "start": 8.5, "energy": 0.6, "style": "massive braam on the first beat"},
               {"name": "Rise", "start": 18, "energy": 0.8}, {"name": "Climax", "start": 40, "energy": 0.95},
@@ -112,7 +113,9 @@ stability를 바꾸거나 모델을 통째로 바꾸는 것은 효과가 없었�
             {"t": 56, "type": "boom"}, {"t": 57.5, "type": "chime"}]}
 ```
 
-- mood: `cinematic`(웅장·기본) / `pulse`(테크) / `soft`(감성·미니멀) / `playful`(경쾌)
+- 곡의 성격은 콘셉트에서 정한다. `"global_styles": ["glitchy breakbeat with janggu percussion", "crisp clicks", "instrumental"]`처럼 장르·악기·질감을 영어로 적으면 ElevenLabs 플랜이 그 문구를 쓴다. 제외할 것은 `"negative_styles"`, 마지막 섹션의 끝맺음은 `"ending"`(기본 "final big hit then long reverb ring out")으로 정한다.
+- `global_styles`가 없으면 mood의 기본 문구를 쓴다: `cinematic`(오케스트라·타이코 트레일러풍) / `pulse`(일렉트로닉 펄스) / `soft`(피아노·현악) / `playful`(경쾌한 팝). `synth_music.py` 대체 경로는 이 네 가지만 만들 수 있으므로 mood는 대체 경로용으로 함께 적어 둔다.
+- 쇼릴은 섹션을 `concept.md`의 구간과 맞춘다. 구간마다 소리의 질감이 바뀌어야 하면 섹션 `style`에 악기 변화를 적는다.
 - sections의 energy(0~1)는 층의 개수를 정한다. 플랜에서는 무드에 맞는 문장으로 바뀐다(테크 무드에 "orchestra"가 들어가지 않는다).
 - 섹션은 4마디 단위로 잡는다(bpm 120이면 8초, 90이면 10.67초). 경계가 마디에 있지 않으면 `plan`이 경고한다. 3초보다 짧은 섹션은 API가 받지 않으므로, `plan`이 경계를 3초 지점으로 밀거나 앞 섹션에 합친다.
 - events: hit, boom, braam, riser(끝이 t), whoosh, chime, stop(음악만 잠깐 끊기 — 정적 연출)
@@ -126,7 +129,7 @@ python3 scripts/eleven.py music audio/music/music.mp3 --plan audio/music/plan.js
 
 - 섹션은 3초 이상이어야 한다. `plan`이 짧은 섹션을 앞 섹션에 합친다.
 - **아티스트·작곡가·곡 이름을 넣지 않는다.** "Hans Zimmer style"이 두 번 400으로 거부됐다. 거부되면 `eleven.py`가 응답의 대체 프롬프트를 보여 준다.
-- 생성 시간은 60초 곡에 1~2분이다. 같은 플랜으로 `--seed`를 바꿔 두 곡을 만들어 고를 수 있다.
+- 생성 시간은 60초 곡에 1~2분이다. 같은 플랜으로 `--seed`를 바꿔 두 곡을 만들어 고를 수 있다. `--prompt`와 `--seed`를 함께 주면 422가 나므로 `eleven.py`가 seed를 빼고 보낸다.
 - 402가 나면 합성 음악으로 간다.
 - 생성된 곡 길이가 요청과 다를 수 있다(10초 요청에 7초가 나온 사례). `music_tools.py fit`으로 영상 길이에 맞춘 뒤 분석한다.
 - 생성된 곡은 대개 평평하다(평가에서 두 곡 모두 82~85%가 최대 세기에서 3dB 안이었다). `analyze`가 경고하면 큰 히트 앞을 믹스에서 내린다. `script.json`의 `music`에 `"automation": [[0, 0], ["line.n07-2.5", 0], ["line.n07-0.3", -10], ["line.n07", 0]]`처럼 [시각, dB]를 적으면 `mix.py`가 그 곡선대로 음악 음량을 바꾼다. 시각은 초·큐 이름·"큐±초"를 쓸 수 있다. 히트 2~3초 앞에서 -8~-12dB로 내렸다가 히트 프레임에 0dB로 돌아오게 하면, 같은 곡에서도 예고 → 타격 구조가 들린다.
@@ -171,10 +174,10 @@ python3 scripts/synth_music.py sfx audio/sfx --names impact,whoosh,riser,logo_hi
 
 배치 원칙:
 
-- **whoosh는 큰 전환 3~5곳에만 쓴다.** 장면마다 넣으면 소리가 싸게 들린다.
+- **같은 whoosh를 모든 전환에 반복하지 않는다.** 장면마다 같은 소리를 넣으면 반복돼 단조롭게 들린다. 화면의 재질(종이, 유리, 액체, 금속, 전자음)에 맞는 소리를 `eleven.py sfx "prompt"`로 따로 만들고, 범용 whoosh는 큰 전환 몇 곳에만 쓴다.
 - 타격음(impact, logo_hit)은 `align: peak`로 화면 히트 프레임에 맞추되, **나레이션의 핵심 단어와 0.2~0.3초 비켜 놓는다.** 로고 히트가 "커넥트"를 덮어 STT가 "Summit"으로 받아쓴 사례가 있다.
 - 라이저는 `align: end`로 끝이 히트 시각에 오게 한다. 1~2초 전에 시작한다.
-- 결론 문장에 chime 하나. 카운터·타이핑 장면에는 counter·typing을 깐다.
+- 화면에 소리 나는 사물(카운터, 자판)이 있으면 그 소리를 같은 프레임에 넣는다.
 - 같은 이벤트가 화면과 소리에 함께 있어야 한다. 효과음 시각은 `script.json`의 큐로 걸어, 화면(`REEL.cue`)과 같은 숫자를 쓴다.
 
 ## 믹스 기준
@@ -187,7 +190,7 @@ python3 scripts/mix.py <프로젝트>/timeline.json
 | --- | --- |
 | 소스 정규화 | 나레이션 말소리 RMS -20dBFS, 음악 -16 LUFS, 효과음 피크 -3dBFS(그 뒤 `gain_db`) |
 | 나레이션 체인 | 하이패스 70Hz, 220Hz -2dB, 3.2kHz +3dB, 9kHz 셸빙 +1.5dB, 컴프레서 3:1 |
-| 나레이션 리버브 | 기본은 넣지 않는다(`--hall 0`). 웅장한 톤에서도 마찬가지이며, 웅장한 느낌은 음악·효과음이 맡는다. 공간감이 꼭 필요할 때만 `--hall 0.04~0.08`(1.4초 홀, 프리딜레이 30ms, 300~5000Hz). `--hall` 값은 말소리 구간의 wet/dry 비율이다(0.06 = wet -24dB) |
+| 나레이션 리버브 | 기본은 넣지 않는다(`--hall 0`). 웅장한 톤에서도 마찬가지이며, 웅장한 느낌은 음악·효과음으로 낸다. 공간감이 꼭 필요할 때만 `--hall 0.04~0.08`(1.4초 홀, 프리딜레이 30ms, 300~5000Hz). `--hall` 값은 말소리 구간의 wet/dry 비율이다(0.06 = wet -24dB) |
 | 말 끝 잔향 | 리버브를 쓰면 `mix.py`가 쉼 앞 말 끝 0.05~0.35초의 잔향 크기를 말소리와 비교해 보여 준다. -32dB 이하 ✓, -28dB 초과 ✗. 이전 기본값(2.4초 홀, `--hall 0.12`)은 -22.8dB로, 에코가 너무 많다는 지적을 받았다 |
 | 음악 | `gain_db` -6~-10, 덕킹 0.7~0.8(말소리 대역은 더 깊게) |
 | 효과음 | 말 위에서 45% 낮춤(`--sfx-duck`) |

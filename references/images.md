@@ -37,11 +37,10 @@
 
 ### 프롬프트 틀
 
-모든 컷에 같은 **공통 꼬리**를 붙여 톤을 맞추고, 팔레트는 영상의 색 토큰과 같은 말로 적는다.
+한 구간의 컷에는 같은 **공통 꼬리**를 붙여 톤을 맞춘다. 꼬리에 넣는 빛·팔레트·질감 문구는 그 구간의 `concept.md` 아트 디렉션을 영어로 옮겨 적는다.
 
 ```
-<장면 묘사: 장소·대상·구도·빛>. Cinematic film still, wide 16:9 landscape frame, moody low-key lighting,
-color palette of deep black, warm gold and cold teal, subtle film grain, photorealistic,
+<장면 묘사: 장소·대상·구도·빛>. <concept.md 구간의 빛·팔레트·질감을 영어로>, wide 16:9 landscape frame,
 large empty negative space on the left for typography, absolutely no text, no letters, no logos, no watermark
 ```
 
@@ -110,9 +109,9 @@ python3 scripts/prep_images.py --sheet <프로젝트>/assets/img --out <프로�
 
 | 기법 | 쓰는 곳 |
 | --- | --- |
-| 켄 번스(scale 1.08→1.18, 느린 이동) | 사진이 나오는 모든 장면. 멈춘 사진은 슬라이드처럼 보인다 |
+| 켄 번스(scale 1.08→1.18, 느린 이동) | 사진을 오래 보여 주는 장면에서 멈춘 사진이 슬라이드처럼 보일 때 |
 | 3D 기울인 카드 + 클립 와이프 | 경력·자료 카드, 폴라로이드 |
-| 누끼 + 림라이트(누끼를 마스크로 금색 그라디언트를 인물 안에만) | 인물 공개, 이름 카드 |
+| 누끼 + 림라이트(누끼를 마스크로 구간 팔레트의 빛을 인물 안쪽 가장자리에만) | 인물 공개, 이름 카드 |
 | 글자 안에 사진 채우기(`background-clip: text`) | 오프닝 키워드 |
 | 흐리고 어둡게(blur 6~10px, brightness 0.5) | 글자 뒤 배경 질감 |
 | 듀오톤·틴트(`mix-blend-mode: color`) | 장면 색을 팔레트에 맞출 때 |

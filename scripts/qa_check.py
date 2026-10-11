@@ -95,7 +95,22 @@ def main():
                 if (i - run0) / fps >= 0.5:
                     dark.append((run0 / fps, i / fps))
                 run0 = None
-        white = int((yavg > 225).sum())
+        # 흰 프레임: 어두운 화면 사이에 0.3초 안쪽으로 튀는 밝은 프레임(과한 플래시)만 센다.
+        # 밝은 바탕으로 디자인한 구간(오래 이어지거나 서서히 밝아진 구간)은 결함이 아니므로 참고로만 적는다
+        white, light_runs, run0 = 0, [], None
+        bright = yavg > 225
+        for i, val in enumerate(list(bright) + [False]):
+            if val and run0 is None:
+                run0 = i
+            elif not val and run0 is not None:
+                seg = float(yavg[run0:i].mean())
+                before = float(yavg[run0 - 1]) if run0 > 0 else seg
+                after = float(yavg[i]) if i < nfr else seg
+                if (i - run0) / fps < 0.3 and seg - before > 60 and seg - after > 60:
+                    white += i - run0
+                else:
+                    light_runs.append((run0 / fps, i / fps))
+                run0 = None
         # 인접 프레임에서 밝기가 0.1 넘게 오른(내린) 화소가 화면 10% 이상이면 전이. 반대 방향 전이 두 번 = 섬광 1회
         events = []
         for i in range(1, nfr):
@@ -116,11 +131,13 @@ def main():
         rep.append(f"- 화면: 평균 밝기 {yavg.mean():.0f}, 어두운 구간 {len(dark)}개, 큰 밝기 전이 {len(events)}회, 섬광 {len(flashes)}회, 흰 프레임 {white}개")
         for s0, s1 in dark:
             rep.append(f"  - 어두운 구간 {s0:.2f}~{s1:.2f}s (의도한 암전·콜드 오픈이 아니면 확인)")
+        for s0, s1 in light_runs[:6]:
+            rep.append(f"  - 밝은 구간 {s0:.2f}~{s1:.2f}s (밝은 바탕으로 디자인한 구간이면 정상)")
         if bad:
             issues.append(f"섬광 과다: {bad[0] / fps:.2f}s 부근 1초에 섬광 3회 초과(화면 10% 이상이 밝기 0.1 넘게 오르내림) — 광과민성 위험. "
                           "동시에 바뀌는 면적을 나누거나 색 반전 대신 위치·크기로 박을 표현할 것")
         if white > fps * 0.3:
-            issues.append(f"하얗게 날아간 프레임 {white}개 — 플래시 세기를 0.15 이하로")
+            issues.append(f"하얗게 튀는 프레임 {white}개(어두운 화면 사이 0.3초 안쪽) — 플래시 세기를 0.15 이하로")
     # 움직임: 멈춘 화면 비율·1초 넘는 멈춤·큰 움직임(그레인을 걸러 낸 64×36 프레임 기준 — motion_check.py 와 같다)
     import motion_check
     tl_json = json.loads(Path(a.timeline).read_text()) if a.timeline and Path(a.timeline).exists() else None

@@ -2,7 +2,7 @@
 """제작 전 환경 점검. 무엇이 있고 무엇이 없는지, 없으면 어떻게 설치하는지 한 번에 보여 준다.
 
 사용법: preflight.py [--voice ibCGc01503OQd2R6i1n1] [--json]
-결과의 '쓸 수 있는 경로'를 브리프에 반영한다(예: 나레이션 불가 → 음악·타이포 버전 제안, Music 불가 → 합성 음악).
+결과의 '쓸 수 있는 경로'를 콘셉트에 반영한다(예: 나레이션 불가 → 음악·화면만으로 전하는 콘셉트, Music 불가 → 합성 음악).
 """
 import argparse
 import json
@@ -82,10 +82,10 @@ def main():
             row("ElevenLabs API 키", True, "유효")
             try:
                 v = json.loads(eleven.request("GET", f"/v1/voices/{a.voice}", retries=1))
-                row("기본 보이스", True, v.get("name", a.voice)[:50])
+                row("점검 보이스(--voice)", True, v.get("name", a.voice)[:50])
                 caps["narration"] = True
             except eleven.ElevenError as e:
-                row("기본 보이스", False, str(e)[:80], "Free 플랜이면 라이브러리 보이스가 막힌다 → 유료 플랜 또는 eleven.py voices 로 다른 보이스")
+                row("점검 보이스(--voice)", False, str(e)[:80], "Free 플랜이면 라이브러리 보이스가 막힌다 → 유료 플랜 또는 eleven.py voices 로 다른 보이스")
                 caps["narration"] = "other_voice"
             try:
                 s = json.loads(eleven.request("GET", "/v1/user/subscription", retries=1))
@@ -108,7 +108,7 @@ def main():
     print(f"  렌더링        {'가능' if all(r[0] == '✓' for r in rows[:4]) else '설치 필요'}")
     print(f"  이미지 생성    {'codex-image (+photoreal)' if caps.get('image_gen') else '불가 → 타이포·그래픽·사용자 제공 사진으로 구성'}")
     n = caps.get("narration")
-    print(f"  나레이션      {'ElevenLabs (기본 보이스)' if n is True else '다른 보이스 필요' if n == 'other_voice' else '불가 → 음악·자막 버전'}")
+    print(f"  나레이션      {'ElevenLabs (점검 보이스 사용 가능)' if n is True else '다른 보이스 필요' if n == 'other_voice' else '불가 → 음악·자막 버전'}")
     m = caps.get("music_api")
     print(f"  음악          {'ElevenLabs Music' if m else '합성 음악(synth_music.py)' if m is False else 'ElevenLabs Music 시도 → 402 면 합성 음악'}")
     if fix:

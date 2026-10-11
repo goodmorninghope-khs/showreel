@@ -1,4 +1,5 @@
-/* showreel FX — 쇼릴 느낌을 만드는 전역 레이어 모음. engine.js 다음에 불러온다.
+/* showreel FX — 전역 레이어 모음(모두 선택 사항). engine.js 다음에 불러온다.
+ * 콘셉트에 필요한 것만 호출한다. 레터박스·그레인·비네트·HUD를 습관처럼 모두 붙이지 않는다(references/design.md "뻔한 화면").
  * 모두 시간 t의 순수 함수로 그려지므로 렌더 워커·모션 블러와 함께 써도 된다.
  *
  *   FX.camera({ shakes: [[t, amp, decay]], drift: 0.6, zoom: [[t, scale, ease], ...], whips: [[t, dir]], beat: { hits, amount } })
@@ -8,14 +9,14 @@
  *   FX.floor({ from, to })                       흘러오는 원근 격자 바닥(장면 뒤) — 검은 배경이 멈춰 보이지 않게
  *   FX.dust({ n, color, from, to })              떠다니는 빛 먼지(부차 움직임, 장면 뒤)
  *   FX.rays({ x, y, from, to })                  천천히 도는 빛줄기(장면 뒤)
- *   FX.flash([[t, dur, opacity, color]])        히트 순간의 섬광(screen). opacity는 0.08~0.3, dur는 0.1~0.3초 권장
+ *   FX.flash([[t, dur, opacity, color]])        히트 순간의 섬광(screen). opacity는 0.15 이하(어두운 배경), dur는 0.12~0.25초
  *   FX.letterbox(t => 0..1, { ratio: 2.39 })    시네마 레터박스. 함수가 1이면 완전히 닫힘
  *   FX.vignette({ strength: 0.6 })
  *   FX.grain({ opacity: 0.09, fps: 24 })        시드 고정 필름 그레인
  *   FX.leak([[t, dur, color, x]])               라이트 리크(빛 번짐)
  *   FX.hud({ left, right: t => '', chapters: [[t, '01 / TITLE']], timecode, progress, corners, from, to, color, marginTop, marginBottom })
  *   FX.subtitles({ lines: REEL.TL.vo, size, bottom, font })   번인 자막(TL.vo 의 sub). "nosub": true 줄은 번인에서 빠진다(SRT 에는 남음)
- *   세로(9:16) 영상이면 HUD·자막이 앱 UI 영역(위 250px·아래 400px)을 자동으로 피한다
+ *   세로(9:16) 영상이면 HUD·자막이 앱 UI 영역(위 250px·아래 420px)을 자동으로 피한다
  *
  * floor·dust·rays 는 장면 뒤(back)에 깔린다. 장면이 불투명한 배경을 깔면 가려지므로 그 장면 안에서는 배경을 투명하게 두거나 직접 움직인다.
  * 나머지는 호출 순서가 곧 위아래다. 보통 camera → impact → wipe → flash → leak → letterbox → vignette → grain → hud → subtitles 순.
@@ -58,7 +59,7 @@
 
   // 큰 타격 한 번에 들어가는 것을 한꺼번에 그린다: 가운데 빛점, 충격파 두 겹, 사방으로 튀는 빛줄기, 가로 플레어(2.4초).
   //   FX.impact([[t, { x, y, color, size, streaks, rings, flare }]])  — x·y 는 픽셀(기본 화면 가운데), size 는 배율
-  // 흔들림은 FX.camera 의 shakes 에, 글자 슬램은 장면 코드에 같은 t 로 넣는다. 1분에 3~6번이 알맞다.
+  // 흔들림은 FX.camera 의 shakes 에, 글자 슬램은 장면 코드에 같은 t 로 넣는다. 몇 번 쓸지는 콘셉트가 정한다.
   function impact(list) {
     let ctx, dirty = false;
     const items = list.map(([t0, o = {}]) => ({ t0: R.when(t0), x: o.x ?? R.W / 2, y: o.y ?? R.H / 2, col: o.color || '#F3C27A',
@@ -304,7 +305,7 @@
     }, { setup: p => {
       root = h('div', 'fx-hud', p);
       root.style.cssText = full + `font:500 15px/1 ${font};letter-spacing:.18em;color:${color};text-transform:uppercase`;
-      // 세로(9:16) 영상은 앱 UI(위 약 250px, 아래 약 400px)를 피한다
+      // 세로(9:16) 영상은 앱 UI(위 약 250px, 아래 약 420px)를 피한다
       const vertical = R.H > R.W;
       const mx = opts.marginX ?? (vertical ? 60 : 46), mt = opts.marginTop ?? (vertical ? 250 : 46), mb = opts.marginBottom ?? (vertical ? 420 : 46);
       const pos = (x, y) => `position:absolute;${x};${y};`;

@@ -85,6 +85,21 @@ def main():
             base = cues[name]
         return base + (float(off) * (1 if sign == "+" else -1) if off else 0.0)
 
+    # ── 음악 분석(선택) ── 나레이션·장면·효과음보다 먼저: 셋 모두 "bar9", "music.hit2" 큐를 쓸 수 있게
+    music_tl = None
+    ma = a.music_analysis or (cfg.get("music") or {}).get("analysis")
+    ma_path = (Path(ma) if Path(ma).is_absolute() else proj / ma) if ma else None
+    if ma_path and ma_path.exists():
+        an = json.loads(ma_path.read_text())
+        off = float((cfg.get("music") or {}).get("start", 0))
+        hits = [round(h + off, 3) for h in an.get("hits", [])]
+        for k, h in enumerate(hits):
+            cues[f"music.hit{k + 1}"] = h
+        for k, b in enumerate(an.get("downbeats", [])):   # 마디 큐: 장면 경계를 "bar8" 처럼 박 격자에 놓는다
+            cues[f"bar{k + 1}"] = round(b + off, 3)
+        music_tl = {"bpm": an.get("bpm"), "hits": hits, "beats": [round(b + off, 3) for b in an.get("beats", [])],
+                    "downbeats": [round(b + off, 3) for b in an.get("downbeats", [])]}
+
     # ── 나레이션 배치 ──
     vo = []
     prev_end = None
@@ -164,21 +179,7 @@ def main():
     for i, s in enumerate(scenes):
         if s["end"] is None:
             s["end"] = scenes[i + 1]["start"] if i + 1 < len(scenes) else dur
-
-    # ── 음악 분석(선택) ──
-    music_tl = None
-    ma = a.music_analysis or (cfg.get("music") or {}).get("analysis")
-    ma_path = (Path(ma) if Path(ma).is_absolute() else proj / ma) if ma else None
-    if ma_path and ma_path.exists():
-        an = json.loads(ma_path.read_text())
-        off = float((cfg.get("music") or {}).get("start", 0))
-        hits = [round(h + off, 3) for h in an.get("hits", [])]
-        for k, h in enumerate(hits):
-            cues[f"music.hit{k + 1}"] = h
-        for k, b in enumerate(an.get("downbeats", [])):   # 마디 큐: 장면 경계를 "bar8" 처럼 박 격자에 놓는다
-            cues[f"bar{k + 1}"] = round(b + off, 3)
-        music_tl = {"bpm": an.get("bpm"), "hits": hits, "beats": [round(b + off, 3) for b in an.get("beats", [])],
-                    "downbeats": [round(b + off, 3) for b in an.get("downbeats", [])]}
+            cues[f"scene.{s['id']}.end"] = round(s["end"], 3)   # end 를 적지 않은 장면도 .end 큐를 쓸 수 있게
 
     # ── 효과음 ──
     sfx = []

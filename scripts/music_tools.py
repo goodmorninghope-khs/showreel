@@ -15,6 +15,9 @@
       길이 차이가 6% 이내면 템포를 미세 조정(atempo), 아니면 자르거나 채운 뒤 끝을 페이드. 소스 레벨 -16 LUFS.
 
 스펙의 sections[].energy(0~1)는 plan 에서 문장으로 바뀐다. sections[].style 에 직접 묘사를 더할 수 있다(영어 권장).
+곡 전체의 성격을 무드 4종(cinematic·pulse·soft·playful) 밖에서 정하려면 "global_styles": ["...", ...] 를 쓴다.
+  이때 무드의 기본 문구 대신 global_styles 가 쓰이고(필요하면 "negative_styles" 로 제외할 것도 지정), 에너지 문장은 장르 중립 표현을 쓴다.
+  "mood" 는 synth_music.py 대체 경로용으로 남겨 둔다.
 주의: 아티스트·작곡가·곡 이름("Hans Zimmer style" 등)은 저작권 필터에 걸려 400 으로 거부된다. 장르·악기·분위기로만 쓴다.
 """
 import argparse
@@ -38,7 +41,8 @@ MOOD_STYLES = {
 }
 
 
-ENERGY_WORDS = {   # 무드마다 에너지 단계별 표현(테크 무드에 "full orchestra"가 들어가지 않게)
+ENERGY_WORDS = {   # 무드마다 에너지 단계별 표현(테크 무드에 "full orchestra"가 들어가지 않게). neutral 은 global_styles 를 쓸 때
+    "neutral": [["sparse and quiet", "minimal"], ["building tension"], ["driving", "full arrangement"], ["peak energy", "maximum energy"]],
     "cinematic": [["sparse and quiet", "minimal, atmospheric"], ["building tension", "restrained pulse"],
                   ["driving rhythm", "full arrangement"], ["epic climax", "powerful drums and full orchestra", "maximum energy"]],
     "pulse": [["sparse and quiet", "minimal synth texture"], ["building tension", "filtered pulse"],
@@ -59,8 +63,13 @@ def cmd_plan(a):
     spec = json.loads(Path(a.spec).read_text())
     dur = float(spec["duration"])
     mood = spec.get("mood", "cinematic")
-    pos, neg = MOOD_STYLES.get(mood, MOOD_STYLES["cinematic"])
-    pos = list(pos)
+    if spec.get("global_styles"):          # 콘셉트가 정한 곡의 성격. 무드 기본 문구를 쓰지 않는다
+        pos, neg = list(spec["global_styles"]), list(spec.get("negative_styles", ["vocals", "singing", "lyrics"]))
+        ew = "neutral"
+    else:
+        pos, neg = MOOD_STYLES.get(mood, MOOD_STYLES["cinematic"])
+        pos, neg = list(pos), list(neg) + list(spec.get("negative_styles", []))
+        ew = mood
     if spec.get("bpm"):
         pos.append(f"{int(spec['bpm'])} BPM")
     if spec.get("key"):
@@ -106,7 +115,7 @@ def cmd_plan(a):
     for i, s in enumerate(merged):
         st = s["start"]
         en = merged[i + 1]["start"] if i + 1 < len(merged) else dur
-        local = energy_words(float(s.get("energy", 0.5)), mood) + ([s["style"]] if s.get("style") else [])
+        local = energy_words(float(s.get("energy", 0.5)), ew) + ([s["style"]] if s.get("style") else [])
         lneg = []
         for ev in events:
             t = float(ev["t"])

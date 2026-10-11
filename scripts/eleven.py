@@ -27,7 +27,7 @@ import time
 from pathlib import Path
 
 API = "https://api.elevenlabs.io"
-DEFAULT_VOICE = "ibCGc01503OQd2R6i1n1"   # Marcus — 깊은 바리톤 한국어(웅장한 내레이션 기본값)
+DEFAULT_VOICE = "ibCGc01503OQd2R6i1n1"   # Marcus — 깊은 바리톤 한국어. 아래 설정을 낭독용으로 검증한 보이스(script.json 에 voice 가 없을 때 쓰는 값)
 DEFAULT_MODEL = "eleven_multilingual_v2"
 DEFAULT_SETTINGS = {"stability": 0.45, "similarity_boost": 0.8, "style": 0.4, "use_speaker_boost": True, "speed": 1.0}
 SKILL = Path(__file__).resolve().parent.parent
@@ -185,6 +185,9 @@ def music(out, plan=None, prompt=None, length_s=None, model="music_v1", seed=Non
         body = {"composition_plan": plan, "model_id": model}
     else:
         body = {"prompt": prompt, "music_length_ms": int(max(3, length_s) * 1000), "model_id": model, "force_instrumental": True}
+    if seed is not None and plan is None:   # --prompt 와 seed 를 함께 보내면 422 가 났다(2026-10 비교 실험)
+        print("  ! --seed 는 --plan 과 함께만 쓴다. --prompt 생성에서는 seed 를 빼고 보낸다", file=sys.stderr)
+        seed = None
     if seed is not None:
         body["seed"] = int(seed)
     for f in (fmt, "mp3_44100_128"):
@@ -292,7 +295,11 @@ def load_presets(path=None):
 
 def cmd_sfx(a):
     sfx(a.text, a.out, dur=a.dur, influence=a.influence, loop=a.loop)
-    print(f"{a.out} {duration(a.out):.2f}s peak {peak_db(a.out):.1f}dB")
+    pk = peak_db(a.out)
+    print(f"{a.out} {duration(a.out):.2f}s peak {pk:.1f}dB")
+    if pk <= -24:   # 거의 무음으로 생성되는 경우가 있다(sfx-kit 과 같은 기준)
+        print(f"✗ 거의 무음(peak {pk:.1f}dB) — 프롬프트를 바꿔 다시 만들 것", file=sys.stderr)
+        return 2
     return 0
 
 

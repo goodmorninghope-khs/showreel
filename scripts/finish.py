@@ -83,11 +83,13 @@ def main():
             cmd += ["-c:a", "aac", "-b:a", "192k"]
         cmd += ["-t", f"{vdur:.3f}", "-movflags", "+faststart", str(web)]
         run(cmd)
-        if a.audio:   # AAC 를 한 번 더 인코딩하면 피크가 오른다 → 넘으면 오디오만 낮춰 다시(영상은 복사)
-            _, _, tp = loud(web)
-            if tp is not None and tp > -1.0:
+        if a.audio:   # AAC 를 한 번 더 인코딩하면 피크가 오른다 → 넘으면 오디오만 낮춰 다시(영상은 복사). 다시 재서 통과할 때까지 최대 3번
+            for _ in range(3):
+                _, _, tp = loud(web)
+                if tp is None or tp <= -1.0:
+                    break
                 tmp = web.with_name(web.stem + ".tmp.mp4")
-                run(["ffmpeg", "-v", "error", "-y", "-i", str(web), "-c:v", "copy", "-af", f"volume={-1.2 - tp:.2f}dB",
+                run(["ffmpeg", "-v", "error", "-y", "-i", str(web), "-c:v", "copy", "-af", f"volume={-1.6 - tp:.2f}dB",
                      "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(tmp)])
                 tmp.replace(web)
         outs.append(web)
