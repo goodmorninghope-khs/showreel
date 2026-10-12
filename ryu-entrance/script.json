@@ -1,6 +1,31 @@
-{"duration": 20, "fps": 30, "lines": [],
- "scenes": [{"id":"s01","start":0},{"id":"s02","start":2.667},{"id":"s03","start":5.333},{"id":"s04","start":10.667}],
- "sfx": [{"name":"whoosh","at":2.667,"align":"peak","gain_db":0},{"name":"whoosh","at":5.333,"align":"peak","gain_db":0},
-         {"name":"whoosh","at":10.667,"align":"peak","gain_db":-1},{"name":"riser","at":13.3,"align":"end","gain_db":-6},
-         {"name":"impact","at":13.333,"align":"peak","gain_db":-3}],
- "music": {"file":"audio/music/music.wav","analysis":"audio/music/analysis.json"}}
+{
+ "duration": 24,
+ "fps": 30,
+ "lines": [],
+ "scenes": [
+  {
+   "id": "s01",
+   "start": 0
+  },
+  {
+   "id": "s02",
+   "start": 4.0
+  },
+  {
+   "id": "s03",
+   "start": 12.0
+  }
+ ],
+ "sfx": [
+  {
+   "name": "impact",
+   "at": 12.0,
+   "align": "peak",
+   "gain_db": -6
+  }
+ ],
+ "music": {
+  "file": "audio/music/music.wav",
+  "analysis": "audio/music/analysis.json"
+ }
+}
