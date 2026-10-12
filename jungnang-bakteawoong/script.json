@@ -1,0 +1,67 @@
+{
+ "duration": 30,
+ "fps": 30,
+ "lines": [],
+ "scenes": [
+  {
+   "id": "s01",
+   "start": 0
+  },
+  {
+   "id": "s02",
+   "start": 5.333
+  },
+  {
+   "id": "s03",
+   "start": 10.667
+  },
+  {
+   "id": "s04",
+   "start": 16.0
+  },
+  {
+   "id": "s05",
+   "start": 21.333
+  },
+  {
+   "id": "s06",
+   "start": 25.333
+  }
+ ],
+ "sfx": [
+  {
+   "name": "whoosh",
+   "at": 5.333,
+   "align": "peak",
+   "gain_db": 0
+  },
+  {
+   "name": "whoosh",
+   "at": 10.667,
+   "align": "peak",
+   "gain_db": 0
+  },
+  {
+   "name": "whoosh",
+   "at": 16.0,
+   "align": "peak",
+   "gain_db": 0
+  },
+  {
+   "name": "riser",
+   "at": 20.95,
+   "align": "end",
+   "gain_db": -8
+  },
+  {
+   "name": "impact",
+   "at": 21.333,
+   "align": "peak",
+   "gain_db": -4
+  }
+ ],
+ "music": {
+  "file": "audio/music/music.wav",
+  "analysis": "audio/music/analysis.json"
+ }
+}

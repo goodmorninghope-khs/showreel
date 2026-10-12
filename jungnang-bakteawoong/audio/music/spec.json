@@ -1,0 +1,12 @@
+{
+  "duration": 30, "mood": "cinematic", "bpm": 90, "key": "D", "minor": true,
+  "progression": ["i", "VI", "III", "VII"],
+  "global_styles": ["epic cinematic orchestral trailer", "low brass, taiko, string ostinato, solemn choir pad", "instrumental"],
+  "sections": [{"name": "Eye", "start": 0, "energy": 0.15}, {"name": "Career", "start": 5.333, "energy": 0.42},
+               {"name": "Books", "start": 10.667, "energy": 0.58}, {"name": "Nation", "start": 16.0, "energy": 0.74},
+               {"name": "Name", "start": 21.333, "energy": 0.96}, {"name": "Endcard", "start": 25.333, "energy": 0.5}],
+  "events": [{"t": 0.2, "type": "boom"}, {"t": 5.333, "type": "hit"}, {"t": 10.667, "type": "hit"}, {"t": 16.0, "type": "boom"},
+             {"t": 18.9, "type": "riser", "dur": 2.0}, {"t": 20.95, "type": "stop", "dur": 0.38},
+             {"t": 21.333, "type": "braam"}, {"t": 21.333, "type": "hit"}, {"t": 25.333, "type": "boom"}, {"t": 25.5, "type": "chime"}],
+  "fade_in": 0.2, "fade_out": 2.4
+}

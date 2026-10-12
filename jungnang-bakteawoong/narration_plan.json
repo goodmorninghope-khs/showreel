@@ -1,0 +1,53 @@
+{
+ "note": "ElevenLabs 키(또는 녹음 음성)가 생기면 이 lines 를 script.json 의 lines 로 옮기고 narrate.py → timeline.py → mix.py → finish.py. 화면은 고정 시각이라 재렌더 불필요.",
+ "voice": "ibCGc01503OQd2R6i1n1",
+ "model": "eleven_multilingual_v2",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8,
+  "style": 0.4,
+  "speed": 1.0
+ },
+ "lines": [
+  {
+   "id": "n01",
+   "text": "눈을 떠 보니, 세상이 바뀌어 있었습니다.",
+   "at": 0.9
+  },
+  {
+   "id": "n02",
+   "text": "기자로, 인터넷 기업의 경영자로.",
+   "at": 5.6
+  },
+  {
+   "id": "n03",
+   "text": "한국 디지털의 현장을 지켜 온 사람.",
+   "at": "line.n02.end+0.35"
+  },
+  {
+   "id": "n04",
+   "text": "『눈 떠보니 선진국』, 『박태웅의 AI 강의』.",
+   "tts": "눈 떠보니 선진국. 박태웅의 에이아이 강의.",
+   "at": 11.0,
+   "takes": 3
+  },
+  {
+   "id": "n05",
+   "text": "그리고 지금, 국가 인공지능 전략의 한가운데에서 묻습니다.",
+   "at": 16.3
+  },
+  {
+   "id": "n06",
+   "text": "박태웅.",
+   "at": 21.5,
+   "takes": 3
+  },
+  {
+   "id": "n07",
+   "text": "10월 15일, 제1회 중랑책문에서 만납니다.",
+   "tts": "시월 십오일, 제일회 중랑책문에서 만납니다.",
+   "at": 25.7,
+   "takes": 3
+  }
+ ]
+}
