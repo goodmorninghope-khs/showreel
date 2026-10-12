@@ -1,0 +1,11 @@
+{
+  "duration": 20, "mood": "cinematic", "bpm": 90, "key": "D", "minor": false,
+  "progression": ["I", "V", "vi", "IV"],
+  "global_styles": ["uplifting cinematic orchestral anthem", "bright brass, strings, taiko", "instrumental"],
+  "sections": [{"name": "Petals", "start": 0, "energy": 0.2}, {"name": "Slogan", "start": 2.667, "energy": 0.5},
+               {"name": "Vision", "start": 5.333, "energy": 0.72}, {"name": "Build", "start": 10.667, "energy": 0.6},
+               {"name": "Name", "start": 13.333, "energy": 0.95}, {"name": "Hold", "start": 16.0, "energy": 0.7}],
+  "events": [{"t": 0.1, "type": "boom"}, {"t": 2.667, "type": "hit"}, {"t": 5.333, "type": "hit"}, {"t": 10.667, "type": "boom"},
+             {"t": 11.4, "type": "riser", "dur": 1.9}, {"t": 13.333, "type": "braam"}, {"t": 13.333, "type": "hit"}, {"t": 16.0, "type": "chime"}],
+  "fade_in": 0.2, "fade_out": 2.2
+}

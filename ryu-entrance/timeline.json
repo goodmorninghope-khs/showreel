@@ -1,0 +1,160 @@
+{
+ "duration": 20.0,
+ "fps": 30,
+ "vo": [],
+ "cues": {
+  "scene.s01": 0.0,
+  "bar1": 0.723,
+  "music.hit1": 2.647,
+  "scene.s02": 2.667,
+  "scene.s01.end": 2.667,
+  "bar2": 3.334,
+  "music.hit2": 3.994,
+  "music.hit3": 5.317,
+  "scene.s03": 5.333,
+  "scene.s02.end": 5.333,
+  "bar3": 5.945,
+  "music.hit4": 6.664,
+  "music.hit5": 7.988,
+  "bar4": 8.555,
+  "music.hit6": 9.334,
+  "music.hit7": 10.658,
+  "scene.s04": 10.667,
+  "scene.s03.end": 10.667,
+  "bar5": 11.166,
+  "music.hit8": 12.005,
+  "music.hit9": 13.328,
+  "bar6": 13.777,
+  "music.hit10": 14.675,
+  "music.hit11": 15.999,
+  "bar7": 16.388,
+  "music.hit12": 17.322,
+  "music.hit13": 18.669,
+  "bar8": 18.999,
+  "scene.s04.end": 20.0
+ },
+ "scenes": [
+  {
+   "id": "s01",
+   "start": 0.0,
+   "end": 2.667
+  },
+  {
+   "id": "s02",
+   "start": 2.667,
+   "end": 5.333
+  },
+  {
+   "id": "s03",
+   "start": 5.333,
+   "end": 10.667
+  },
+  {
+   "id": "s04",
+   "start": 10.667,
+   "end": 20.0
+  }
+ ],
+ "sfx": [
+  {
+   "name": "whoosh",
+   "file": "audio/sfx/whoosh.wav",
+   "t": 2.667,
+   "gain_db": 0,
+   "align": "peak"
+  },
+  {
+   "name": "whoosh",
+   "file": "audio/sfx/whoosh.wav",
+   "t": 5.333,
+   "gain_db": 0,
+   "align": "peak"
+  },
+  {
+   "name": "whoosh",
+   "file": "audio/sfx/whoosh.wav",
+   "t": 10.667,
+   "gain_db": -1,
+   "align": "peak"
+  },
+  {
+   "name": "riser",
+   "file": "audio/sfx/riser.wav",
+   "t": 13.3,
+   "gain_db": -6,
+   "align": "end"
+  },
+  {
+   "name": "impact",
+   "file": "audio/sfx/impact.wav",
+   "t": 13.333,
+   "gain_db": -3,
+   "align": "peak"
+  }
+ ],
+ "music": {
+  "file": "audio/music/music.wav",
+  "analysis": "audio/music/analysis.json"
+ },
+ "music_tl": {
+  "bpm": 91.92,
+  "hits": [
+   2.647,
+   3.994,
+   5.317,
+   6.664,
+   7.988,
+   9.334,
+   10.658,
+   12.005,
+   13.328,
+   14.675,
+   15.999,
+   17.322,
+   18.669
+  ],
+  "beats": [
+   0.07,
+   0.723,
+   1.375,
+   2.028,
+   2.681,
+   3.334,
+   3.986,
+   4.639,
+   5.292,
+   5.945,
+   6.597,
+   7.25,
+   7.903,
+   8.555,
+   9.208,
+   9.861,
+   10.514,
+   11.166,
+   11.819,
+   12.472,
+   13.125,
+   13.777,
+   14.43,
+   15.083,
+   15.736,
+   16.388,
+   17.041,
+   17.694,
+   18.346,
+   18.999,
+   19.652
+  ],
+  "downbeats": [
+   0.723,
+   3.334,
+   5.945,
+   8.555,
+   11.166,
+   13.777,
+   16.388,
+   18.999
+  ]
+ }
+}

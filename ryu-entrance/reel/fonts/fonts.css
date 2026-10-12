@@ -1,0 +1,12 @@
+/* new_project.py 가 만든다. 실제로 있는 폰트만 적는다. 쓰는 굵기와 font-weight 가 맞아야 대체 글꼴이 안 나온다. */
+@font-face { font-family: "Anton"; src: url("Anton-400.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Black Han Sans"; src: url("BlackHanSans-400.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-400.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-500.ttf") format("truetype"); font-weight: 500; font-display: block; }
+@font-face { font-family: "JetBrains Mono"; src: url("JetBrainsMono-700.ttf") format("truetype"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Noto Sans KR"; src: url("NotoSansKR-300.ttf") format("truetype"); font-weight: 300; font-display: block; }
+@font-face { font-family: "Noto Sans KR"; src: url("NotoSansKR-500.ttf") format("truetype"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Noto Sans KR"; src: url("NotoSansKR-900.ttf") format("truetype"); font-weight: 900; font-display: block; }
+@font-face { font-family: "Noto Serif KR"; src: url("NotoSerifKR-500.ttf") format("truetype"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Noto Serif KR"; src: url("NotoSerifKR-700.ttf") format("truetype"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Noto Serif KR"; src: url("NotoSerifKR-900.ttf") format("truetype"); font-weight: 900; font-display: block; }
